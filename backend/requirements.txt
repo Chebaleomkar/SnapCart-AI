@@ -1,0 +1,10 @@
+# SnapCartAI Dependencies
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+python-dotenv==1.0.1
+yt-dlp>=2026.3.3
+faster-whisper==1.1.0
+groq==0.13.0
+httpx==0.28.0
+requests>=2.31.0
+pydantic==2.10.0
