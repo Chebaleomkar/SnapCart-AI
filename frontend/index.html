@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapCartAI — Recipe to Cart in Seconds</title>
+    <meta name="description" content="Paste a recipe video URL, we extract ingredients and add them to your Swiggy Instamart cart automatically.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Background Glow -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🛒</span>
+                <h1>Snap<span class="accent">Cart</span>AI</h1>
+            </div>
+            <p class="tagline">Paste a recipe video → We add ingredients to your cart</p>
+        </header>
+
+        <!-- URL Input Section -->
+        <section class="input-section">
+            <div class="input-card glass-card">
+                <div class="input-wrapper">
+                    <div class="platform-icons">
+                        <span class="platform-icon" title="YouTube">▶️</span>
+                        <span class="platform-icon" title="Instagram">📸</span>
+                        <span class="platform-icon" title="TikTok">🎵</span>
+                    </div>
+                    <input 
+                        type="url" 
+                        id="url-input" 
+                        placeholder="Paste a recipe video URL (YouTube, Instagram, TikTok)" 
+                        autocomplete="off"
+                    >
+                    <button id="process-btn" onclick="processURL()">
+                        <span class="btn-text">Extract & Cart</span>
+                        <span class="btn-loader" style="display:none;">
+                            <span class="spinner"></span>
+                        </span>
+                    </button>
+                </div>
+                <div class="supported-text">
+                    Supports: YouTube videos & shorts • Instagram reels • TikTok videos
+                </div>
+            </div>
+        </section>
+
+        <!-- Pipeline Progress -->
+        <section class="pipeline-section" id="pipeline-section" style="display:none;">
+            <div class="pipeline-card glass-card">
+                <h2 class="section-title">🔄 Pipeline Progress</h2>
+                <div class="pipeline-steps">
+                    <div class="step" id="step-url" data-step="1">
+                        <div class="step-indicator">
+                            <span class="step-number">1</span>
+                            <span class="step-check">✓</span>
+                        </div>
+                        <div class="step-content">
+                            <span class="step-name">URL Parsing</span>
+                            <span class="step-status" id="step-url-status">Waiting...</span>
+                        </div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" id="step-audio" data-step="2">
+                        <div class="step-indicator">
+                            <span class="step-number">2</span>
+                            <span class="step-check">✓</span>
+                        </div>
+                        <div class="step-content">
+                            <span class="step-name">Audio Extraction</span>
+                            <span class="step-status" id="step-audio-status">Waiting...</span>
+                        </div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" id="step-transcribe" data-step="3">
+                        <div class="step-indicator">
+                            <span class="step-number">3</span>
+                            <span class="step-check">✓</span>
+                        </div>
+                        <div class="step-content">
+                            <span class="step-name">Transcription</span>
+                            <span class="step-status" id="step-transcribe-status">Waiting...</span>
+                        </div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" id="step-ingredients" data-step="4">
+                        <div class="step-indicator">
+                            <span class="step-number">4</span>
+                            <span class="step-check">✓</span>
+                        </div>
+                        <div class="step-content">
+                            <span class="step-name">Ingredient Extraction</span>
+                            <span class="step-status" id="step-ingredients-status">Waiting...</span>
+                        </div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" id="step-cart" data-step="5">
+                        <div class="step-indicator">
+                            <span class="step-number">5</span>
+                            <span class="step-check">✓</span>
+                        </div>
+                        <div class="step-content">
+                            <span class="step-name">Add to Cart</span>
+                            <span class="step-status" id="step-cart-status">Waiting...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="results-section" style="display:none;">
+            <!-- Dish Info -->
+            <div class="dish-card glass-card" id="dish-card">
+                <div class="dish-header">
+                    <h2 id="dish-name">—</h2>
+                    <div class="dish-meta">
+                        <span class="badge" id="dish-cuisine">—</span>
+                        <span class="badge" id="dish-servings">—</span>
+                    </div>
+                </div>
+                <p class="dish-notes" id="dish-notes"></p>
+            </div>
+
+            <!-- Ingredients Grid -->
+            <div class="ingredients-card glass-card">
+                <h2 class="section-title">🥬 Ingredients</h2>
+                <div class="ingredients-grid" id="ingredients-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Cart Actions -->
+            <div class="cart-card glass-card" id="cart-card">
+                <h2 class="section-title">🛒 Cart Actions</h2>
+                <div class="cart-summary" id="cart-summary">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="cart-actions" id="cart-actions">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Timing Info -->
+            <div class="timing-card glass-card">
+                <h2 class="section-title">⚡ Performance</h2>
+                <div class="timing-grid" id="timing-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Error Section -->
+        <section class="error-section glass-card" id="error-section" style="display:none;">
+            <div class="error-icon">⚠️</div>
+            <h3 id="error-title">Something went wrong</h3>
+            <p id="error-message"></p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built with 🧠 AI + ❤️ by SnapCartAI • Powered by Groq & Swiggy Instamart</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
